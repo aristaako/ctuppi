@@ -1,0 +1,35 @@
+#aliakset
+alias aliakset='less /home/vagrant/.bash_aliases'
+
+alias gs='git status'
+alias GS='git status'
+alias rbmaster='git pull --rebase origin master:master'
+alias rbdev='git pull --rebase origin dev:dev'
+alias kokis='git-cola'
+
+alias haamu='lein doo phantom'
+alias viikuna='lein figwheel'
+alias figge='lein do clean, figwheel'
+alias leet='lein test'
+alias leinstall='lein install'
+alias apdate='sudo apt-get update'
+alias apdate='sudo apt-get update'
+
+alias ..='cd ..'
+alias ..2='cd ../..'
+alias ..3='cd ../../..'
+alias ..4='cd ../../../..'
+alias ..5='cd ../../../../..'
+alias ..6='cd ../../../../../..'
+alias lst='ls --full-time'
+alias whereami='pwd'
+alias syslogaa='tail -f /var/log/syslog'
+
+function cdl { cd $1; ls; }
+function cdll { cd $1; ls -l; }
+function cd3 { cd $1; tree; }
+function cdg { 
+kohde=$(find . -name $1 |head -1 |grep -Eo "/[ /._A-Za-z0-9\-]+/") 
+kohde=$(sed 's/^.//' <<< ${kohde}) 
+cd ${kohde} 
+}
