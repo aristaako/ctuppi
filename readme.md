@@ -21,7 +21,7 @@ Script for setting up my personal dev environment.
 
 * Install everything silently
 * Maybe add git setup
-* Add emacs cheatsheet
+* Improve emacs cheatsheet
 * Install mailcatcher
 * Install docker
 
@@ -48,6 +48,19 @@ Reload tmux conf: prefix + r
 ```
 Refresh tmux client: prefix + R
 ```
+
+```
+Split window horizontally: prefix + Shift-2
+  Split window vertically: prefix + Shift-5
+```
+
+```
+         Move cursor to pane above: Alt-↑
+         Move cursor to pane below: Alt-↓
+   Move cursor to pane on the left: Alt-←
+  Move cursor to pane on the right: Alt-→
+```
+
 ```
 Open tmux window 10: prefix + F1
 Open tmux window 11: prefix + F2
@@ -63,6 +76,10 @@ Open tmux window 20: prefix + F11
 Open tmux window 21: prefix + F12
 ```
 
+```
+Close pane: prefix + x
+```
+
 #### Splitter
 ```
 Split top left pane into 4 panes: prefix + j
@@ -72,7 +89,7 @@ Split top left pane into 4 panes: prefix + j
 ```
   Install plugins: prefix + I
    Update plugins: prefix + u
-Uninstall plugins: prefix + Alt + u (Uninstalls plugins not in the list of plugins in .tmux.conf)
+Uninstall plugins: prefix + Alt-u (Uninstalls plugins not in the list of plugins in .tmux.conf)
 ```
 
 #### Tmux resurrect
@@ -107,7 +124,7 @@ Copy mode
 ```
                     Open selection with default program: o
                             Open selection with $EDITOR: Ctrl-o
-Search selection from a search engine (default= Google): Shift+s
+Search selection from a search engine (default= Google): Shift-s
 ```
 
 Change default search engine
@@ -118,7 +135,49 @@ Add line to .tmux.conf:
 
 ### Emacs
 
-#### TBD
+```
+  Split window vertically: Ctrl-x 2
+Split window horizontally: Ctrl-x 3
+```
+
+```
+Revert buffer: Ctrl-c x
+```
+
+```
+Cancel command: Ctrl-g
+```
+
+```
+Find and open file into current window: Ctrl-x Ctrl-f
+```
+
+```
+Find and open file into another window: Ctrl-x 4 f
+ Find and open file into another frame: Ctrl-x 5 f
+```
+
+```
+ Search text forwards: Ctrl-s
+Search text backwards: Ctrl-r
+```
+
+```
+Kill whitespace: Alt-\ (Alt-AltGr-+)
+```
+
+```
+     Undo: Ctrl-_ (Ctrl-Shift--)
+Undo tree: Ctrl-x u
+```
+
+```
+Close window: Ctrl-x 0
+```
+
+```
+Arrange windows evenly: Ctrl-x +
+```
 
 ## Author
 
