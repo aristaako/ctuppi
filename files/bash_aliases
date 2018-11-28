@@ -25,6 +25,9 @@ alias lst='ls --full-time'
 alias whereami='pwd'
 alias syslogaa='tail -f /var/log/syslog'
 
+function rgf { 
+rg -g "*$1*" --files ; 
+}
 function cdl { cd $1; ls; }
 function cdll { cd $1; ls -l; }
 function cd3 { cd $1; tree; }
