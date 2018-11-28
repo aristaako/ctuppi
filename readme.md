@@ -7,6 +7,7 @@ Script for setting up my personal dev environment.
 * Konsole
 * Git
 * Tmux
+* Ripgrep
 * Pip
 * Curl
 * Brew
@@ -18,7 +19,6 @@ Script for setting up my personal dev environment.
 
 ## Todo
 
-* Install ripgrep
 * Install everything silently
 * Maybe add git setup
 * Add emacs cheatsheet
