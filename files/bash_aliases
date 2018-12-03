@@ -14,6 +14,7 @@ alias leet='lein test'
 alias leinstall='lein install'
 alias apdate='sudo apt-get update'
 alias apdate='sudo apt-get update'
+alias catch='mailcatcher --http-ip=0.0.0.0'
 
 alias ..='cd ..'
 alias ..2='cd ../..'
