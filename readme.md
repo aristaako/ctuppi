@@ -6,11 +6,12 @@ Script for setting up my personal dev environment.
 
 * Konsole
 * Git
-* Tmux
+* Curl
 * Ripgrep
 * Pip
-* Curl
-* Brew
+* Ruby
+* Mailcatcher
+* Tmux
 * Nvm
 * Node
 * Java
@@ -22,7 +23,6 @@ Script for setting up my personal dev environment.
 * Install everything silently
 * Maybe add git setup
 * Improve emacs cheatsheet
-* Install mailcatcher
 * Install docker
 
 ## Thanks

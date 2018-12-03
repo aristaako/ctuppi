@@ -3,7 +3,7 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 1.0
+# Version     : 1.3
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best
 #===========================================================================
@@ -25,27 +25,18 @@ copy_bash_configs() {
     cp files/git-prompt.sh ~/opt/git-prompt/git-prompt.sh
 }
 
-install_tmux() {
-    echo "Installing tmux"
-    sudo apt-get install tmux  -y -q
-
-    echo "Copying tmux configs to user root"
-    cp files/tmux.conf ~/.tmux.conf
-
-    echo "Downloading tmux reset"
-    curl -Lo ~/.tmux/reset --create-dirs \
-        https://raw.githubusercontent.com/hallazzang/tmux-reset/master/tmux-reset
-}
-
 install_git() {
     echo "Installing git"
     sudo apt install git  -y -q
 
     echo "Installing git-cola"
-    apt-get install git-cola  -y -q
+    sudo apt-get install git-cola  -y -q
 }
 
 install_utils() {
+    echo "Installing curl"
+    sudo apt install curl -y -q
+
     echo "Installing ripgrep"
     curl -LO https://github.com/BurntSushi/ripgrep/releases/download/0.10.0/ripgrep_0.10.0_amd64.deb
     sudo dpkg -i ripgrep_0.10.0_amd64.deb
@@ -53,23 +44,39 @@ install_utils() {
     echo "Installing pip"
     sudo apt-get install python-pip  -y -q
 
-    echo "Installing curl"
-    sudo apt install curl -y -q
+    echo "Installing sqlite3"
+    sudo apt-get install libsqlite3-dev -y -q
 
-    echo "Installing brew"
-    sudo apt install linuxbrew-wrapper -y -q
-    #Warning: /home/linuxbrew/.linuxbrew/bin is not in your PATH.
+    echo "Installing ruby"
+    sudo apt install ruby-full -y -q
 
-    echo "Installing build-essential"
-    sudo apt-get install build-essential -y -q
+    echo "Installing mailcatcher"
+    sudo gem install mailcatcher  
+}
 
-    echo "Install gcc"
-    brew install gcc    
+install_tmux() {
+    echo "Installing tmux"
+    sudo apt-get install tmux  -y -q
+
+    echo "Copying tmux configs to user root"
+    cp files/tmux.conf ~/.tmux.conf
+
+    echo "Downloading tpm"
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+    echo "Downloading tmux reset"
+    curl -Lo ~/.tmux/reset --create-dirs \
+        https://raw.githubusercontent.com/hallazzang/tmux-reset/master/tmux-reset
 }
 
 install_npm() {
     echo "Installing nvm"
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+
+    echo "Reload nvm"
+	export NVM_DIR="$HOME/.nvm"
+	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
     echo "Installing node"
     nvm install node
@@ -91,7 +98,10 @@ install_clojure() {
     sudo ./linux-install-1.9.0.397.sh
 
     echo "Install leiningen"
-    sudo apt-get install leiningen-clojure -y -q
+    curl -o ~/bin/lein --create-dirs https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+    chmod a+x ~/bin/lein
+    PATH=$PATH:~/bin
+    lein
 }
 
 install_emacs() {
@@ -127,6 +137,7 @@ setup_environment() {
     copy_bash_configs
     install_git
     install_utils
+    install_tmux
     install_npm
     install_java
     install_clojure
