@@ -3,10 +3,32 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 1.3
+# Version     : 1.4
 # Notes       : Check readme.md for commands cheatsheet
-# Usage       : Just run the thing and hope for the best
+# Usage       : Just run the thing and hope for the best. See below
+#               for further instructions
 #===========================================================================
+VERSION=1.4
+
+showHelp() {
+cat <<-END
+
+Usage: ./ctuppi.sh 
+        (to run Ctuppi) 
+or ./ctuppi.sh [options]
+        (to run Ctuppi options)
+
+where options include:
+
+-h | --help       print help message to output stream
+-v | --version    print Ctuppi version information
+
+END
+}
+
+showVersion() {
+    echo "Ctuppi $VERSION"
+}
 
 update_apt_packages() {
    sudo apt-get update -y -q
@@ -144,5 +166,36 @@ setup_environment() {
     install_emacs
     refresh_bashrc
 }
+
+invalid() {
+    echo "Invalid argument $1"
+    echo "Use argument -h or --help for instructions."
+}
+
+while getopts ":hv-:" opt; do
+    case $opt in
+        h) 
+            showHelp 
+            exit 0 ;;
+        v) 
+            showVersion
+            exit 0 ;;
+        -) 
+            case "$OPTARG" in
+                version) 
+                    showVersion
+                    exit 0 ;;
+                help) 
+                    showHelp
+                    exit 0 ;;
+                *)
+                    invalid "--${OPTARG}"
+                    exit 0 ;;
+            esac ;;
+        *) 
+            invalid "-$OPTARG"
+            exit 0 ;;        
+    esac
+done
 
 setup_environment
