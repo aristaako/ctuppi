@@ -3,12 +3,14 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 1.4
+# Version     : 1.5
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best. See below
 #               for further instructions
 #===========================================================================
-VERSION=1.4
+VERSION=1.5
+CTUPPIID=ctuppi010500
+LOCK=/tmp/$CTUPPIID.lock
 
 showHelp() {
 cat <<-END
@@ -198,4 +200,20 @@ while getopts ":hv-:" opt; do
     esac
 done
 
+cleanup() {
+    rm -f $LOCK
+}
+
+startup() {
+    if [ -f "$LOCK" ]; then
+        echo "Ctuppi already running"
+        exit
+    fi
+
+    touch $LOCK
+
+    trap cleanup EXIT
+}
+
+startup
 setup_environment
