@@ -26,6 +26,9 @@ alias lst='ls --full-time'
 alias whereami='pwd'
 alias syslogaa='tail -f /var/log/syslog'
 
+#because one needs some auran aallot
+alias aallot='mpv http://hel2-77-86-247-184.ext.nebulacloud.fi:8000/aallot'
+
 function rgf { 
 rg -g "*$1*" --files ; 
 }

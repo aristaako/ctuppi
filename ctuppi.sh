@@ -147,6 +147,12 @@ install_emacs() {
     echo 'export EDITOR=~/bin/emacsnw' >> ~/.bashrc
 }
 
+install_mpv() {
+    echo "Installing mpv"
+    sudo add-apt-repository ppa:mc3man/mpv-tests
+    sudo apt-get install mpv
+}
+
 refresh_bashrc() {
     echo "Refreshing .bashrc"
     source ~/.bashrc
@@ -164,6 +170,7 @@ setup_environment() {
     install_java
     install_clojure
     install_emacs
+    install_mpv
     refresh_bashrc
 }
 
