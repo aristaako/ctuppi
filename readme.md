@@ -14,7 +14,7 @@ Script for setting up my personal dev environment.
 * Tmux
 * Nvm
 * Node
-* Java
+* Java 8
 * Clojure
 * Emacs
 
