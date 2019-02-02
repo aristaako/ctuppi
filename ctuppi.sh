@@ -3,12 +3,12 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 1.5
+# Version     : 1.6
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best. See below
 #               for further instructions
 #===========================================================================
-VERSION=1.5
+VERSION=1.6
 CTUPPIID=ctuppi010500
 LOCK=/tmp/$CTUPPIID.lock
 
@@ -107,9 +107,7 @@ install_npm() {
 }
 
 install_java() {
-    #Or maybe install older jdk:
-    #sudo apt-get install openjdk-8-jdk -y -q
-    sudo apt-get install default-jdk -y -q
+    sudo apt-get install openjdk-8-jdk -y -q
 }
 
 install_clojure() {
