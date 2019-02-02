@@ -17,6 +17,7 @@ Script for setting up my personal dev environment.
 * Java 8
 * Clojure
 * Emacs
+* mpv
 
 ## Todo
 
