@@ -88,7 +88,7 @@ copy_bash_configs() {
 
 set_username_to_bash_configs() {
     echo "Setting current user [$USER] for the bash config paths"
-    sed -i "s/_username_/$USER/"  ̃/.bash_aliases 
+    sed -i "s/_username_/$USER/" ~/.bash_aliases
 }
 
 install_git() {
