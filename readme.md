@@ -9,14 +9,29 @@ Script for setting up my personal dev environment.
 * Curl
 * Ripgrep
 * Pip
+* Python 3 & Pip3
+* SQLite3
 * Ruby
 * Mailcatcher
+* Gedit
+* Atom
+* Tree
+* SDKMAN!
+* Silver Searcher
+* OpenSSH Server
+* Solaar
 * Tmux
 * Nvm
 * Node
-* Java 8
+* Java (current default jdk)
+* Docker
+* Maven
+* Gradle
+* AWS Command Line Interface
 * Clojure
 * Emacs
+* Visual Studio Code
+* Brave
 * mpv
 
 ## Todo
@@ -24,7 +39,8 @@ Script for setting up my personal dev environment.
 * Install everything silently
 * Maybe add git setup
 * Improve emacs cheatsheet
-* Install docker
+* Install mpv for debian
+* Ensure Clojure has compatible Java version (8 or 11)
 
 ## Thanks
 

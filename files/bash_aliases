@@ -1,20 +1,38 @@
 #aliakset
-alias aliakset='less /home/vagrant/.bash_aliases'
+alias aliakset='less /home/_username_/.bash_aliases'
+
+alias reload='. ~/.bashrc'
 
 alias gs='git status'
 alias GS='git status'
+alias gitco='git checkout'
 alias rbmaster='git pull --rebase origin master:master'
 alias rbdev='git pull --rebase origin dev:dev'
+alias eiku='git reset HEAD~'
+alias eikumerge='git reset --soft HEAD@{​​1}​​'
+alias eikueka='git update-ref -d HEAD'
 alias kokis='git-cola'
 
+alias apdate='sudo apt-get update'
+
+alias doi='docker image'
+alias doc='docker container'
+
+alias g='cd /home/_username_/git/'
+
+alias sudona='sudo $(history -p !!)'
+
+#Docker/Leiningen/etc. service starting
+alias docsta='sudo service docker start'
+alias docsto='sudo service docker stop'
+alias sohva='sudo docker start couchdb'
 alias haamu='lein doo phantom'
-alias viikuna='lein figwheel'
-alias figge='lein do clean, figwheel'
+alias viikuna='rlwrap lein figwheel'
+alias figge='rlwrap lein do clean, figwheel'
 alias leet='lein test'
 alias leinstall='lein install'
-alias apdate='sudo apt-get update'
-alias apdate='sudo apt-get update'
-alias catch='mailcatcher --http-ip=0.0.0.0'
+alias jousi='sudo mvn spring-boot:run'
+alias mcatch='mailcatcher --http-ip=0.0.0.0'
 
 alias ..='cd ..'
 alias ..2='cd ../..'
@@ -22,12 +40,15 @@ alias ..3='cd ../../..'
 alias ..4='cd ../../../..'
 alias ..5='cd ../../../../..'
 alias ..6='cd ../../../../../..'
+alias ..7='cd ../../../../../../..'
+alias ..8='cd ../../../../../../../..'
 alias lst='ls --full-time'
 alias whereami='pwd'
 alias syslogaa='tail -f /var/log/syslog'
 
-#because one needs some auran aallot
-alias aallot='mpv http://hel2-77-86-247-184.ext.nebulacloud.fi:8000/aallot'
+alias aallot='mpv https://stream.bauermedia.fi/auranaallot/auranaallot_64.aac'
+alias puhe='mpv http://mediau.yle.fi/liveradiopuhe'
+alias ylex='mpv http://mediau.yle.fi/liveylex'
 
 function rgf { 
 rg -g "*$1*" --files ; 
