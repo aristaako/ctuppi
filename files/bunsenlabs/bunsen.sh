@@ -10,6 +10,8 @@ VERSION=1.0
 BUNSENID=bunsen010000
 LOCK=/tmp/$BUNSENID.lock
 
+BUNSENWEATHER_SCRIPT_FILE=$HOME/.config/conky/scripts/bunsenweather.sh
+
 showHelp() {
 cat <<-END
 
@@ -36,9 +38,26 @@ copy_bunsenlabs_configs() {
     cp prepend.csv ~/.config/jgmenu/prepend.csv
 }
 
+set_bunsenweather_apikey() {
+    read -p "Type your OpenWeatherMap API key: " apikey
+    sed -i "s/api=$/api=$apikey/" $BUNSENWEATHER_SCRIPT_FILE
+}
+
+bunsenweather_apikey_setup() {
+    while true; do
+        read -p "Would you like to give OpenWeatherMap API key to bunsenweather? (y/n) " yn
+        case $yn in
+            [Yy]* ) set_bunsenweather_apikey; break;;
+            [Nn]* ) break;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+}
+
 setup_bunsenlabs() {
     echo "Setting up bunsenlabs"
     copy_bunsenlabs_configs
+    bunsenweather_apikey_setup
 }
 
 invalid() {
