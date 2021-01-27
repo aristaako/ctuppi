@@ -3,13 +3,13 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 2.0
+# Version     : 2.1
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best. See below
 #               for further instructions
 #===========================================================================
-VERSION=2.0
-CTUPPIID=ctuppi020000
+VERSION=2.1
+CTUPPIID=ctuppi021000
 LOCK=/tmp/$CTUPPIID.lock
 
 DEFAULT_DISTRO=ubuntu
@@ -76,6 +76,22 @@ update_apt_packages() {
 install_konsole() {
     echo "Installing konsole"
     sudo apt install konsole -y -q
+}
+
+install_nerd_font() {
+    echo "Installing FiraCode Nerd Font"
+    wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
+    unzip FiraCode.zip -d FiraCode
+    cp -r FiraCode/* ~/.local/share/fonts/
+    rm FiraCode.zip
+    rm -rf FiraCode
+    fc-cache
+}
+
+copy_konsole_profile() {
+    echo "Copying konsole profile"
+    mkdir -p ~/.local/share/konsole
+    cp files/konsole.profile ~/.local/share/konsole
 }
 
 copy_bash_configs() {
@@ -331,6 +347,8 @@ setup_environment() {
     inquire_distro
     update_apt_packages
     install_konsole
+    install_nerd_font
+    copy_konsole_profile
     copy_bash_configs
     set_username_to_bash_configs
     install_git

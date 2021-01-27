@@ -58,10 +58,35 @@ fi
 
 source ~/opt/git-prompt/git-prompt.sh
 
-#https://misc.flogisoft.com/bash/tip_colors_and_formatting
+# https://misc.flogisoft.com/bash/tip_colors_and_formatting
+RESET_COLORS="\[\e[0m\]"
+
+TEXT_COLOR="\[\e[0;49;90m\]"
+PROMPT_COLOR="\[\e[1;49;32m\]"
+
+function branch_color {
+    local git_status="$(git status 2> /dev/null)"
+    if [[ $git_status =~ "nothing to commit" ]]; then
+        echo -e ''
+    elif [[ $git_status =~ "nothing added to commit but untracked" ]]; then
+        echo -e '\e[38;5;166m'
+    else
+        echo -e '\e[38;5;196m'
+    fi
+}
 
 if [ "$color_prompt" = yes ]; then
-     PS1='\[\e[0;49;90m\]\w\[\e[00m\]$(__git_ps1) \[\e[1;49;32m\]>: \[\e[0m\]'
+    PS1=""
+    # PS1+="\n" # new line
+    PS1+="${TEXT_COLOR}\w " # current directory path
+    PS1+="" # section splitter
+    PS1+=" "
+    PS1+=" \$(find . -mindepth 1 -maxdepth 1 -type d | wc -l) " # folder count
+    PS1+=" \$(find . -mindepth 1 -maxdepth 1 -type f | wc -l) " # file count
+    PS1+=" \$(find . -mindepth 1 -maxdepth 1 -type l | wc -l) " # symlink count
+    PS1+="" # section splitter
+    PS1+='$(branch_color)$(__git_ps1 " \[\e[00m\] %s \[\e[0;49;90m\]")' # git branch
+    PS1+="${PROMPT_COLOR} >: ${RESET_COLORS}" # prompt
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -80,8 +105,8 @@ esac
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -104,7 +129,6 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
