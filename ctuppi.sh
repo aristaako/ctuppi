@@ -3,13 +3,13 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 2.1
+# Version     : 2.2
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best. See below
 #               for further instructions
 #===========================================================================
-VERSION=2.1
-CTUPPIID=ctuppi021000
+VERSION=2.2
+CTUPPIID=ctuppi022000
 LOCK=/tmp/$CTUPPIID.lock
 
 DEFAULT_DISTRO=ubuntu
@@ -82,6 +82,7 @@ install_nerd_font() {
     echo "Installing FiraCode Nerd Font"
     wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
     unzip FiraCode.zip -d FiraCode
+    mkdir ~/.local/share/fonts/
     cp -r FiraCode/* ~/.local/share/fonts/
     rm FiraCode.zip
     rm -rf FiraCode
@@ -115,6 +116,28 @@ install_git() {
     sudo apt install git-cola  -y -q
 }
 
+configure_git() {
+    git_username=$(git config user.name)
+    git_useremail=$(git config user.email)
+    if [[ -z "$git_username" ]]; then
+        echo "Configuring git: git username not set"
+        username=
+        while [[ $username = "" ]]; do
+            read -p "Enter git username: " username
+        done
+        git config --global user.name "$username"
+    fi
+    if [[ -z "$git_useremail" ]]; then
+        echo "Configuring git: git email not set"
+        email=
+        while [[ $email = "" ]]; do
+            read -p "Enter git email: " email
+        done
+        git config --global user.email "$email"
+    fi
+}
+
+
 install_utils() {
     echo "Installing curl"
     sudo apt install curl -y -q
@@ -145,6 +168,8 @@ install_utils() {
     sudo apt install gedit -y -q
 
     echo "Installing atom"
+    wget -qO - https://packagecloud.io/AtomEditor/atom/gpgkey | sudo apt-key add
+    sudo sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/atom.list'
     sudo apt install atom -y -q
 
     echo "Installing tree"
@@ -182,10 +207,12 @@ install_tmux() {
         https://raw.githubusercontent.com/hallazzang/tmux-reset/master/tmux-reset
 }
 
-install_npm() {
+install_nvm() {
     echo "Installing nvm"
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+}
 
+install_node() {
     echo "Installing node"
     nvm install node
 }
@@ -307,9 +334,9 @@ install_vscode() {
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
     sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
     sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-    sudo apt install apt-transport-https
+    sudo apt install apt-transport-https -y -q
     sudo apt update
-    sudo apt install code
+    sudo apt install code -y -q
 }
 
 install_brave() {
@@ -318,7 +345,7 @@ install_brave() {
     curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | sudo apt-key --keyring /etc/apt/trusted.gpg.d/brave-browser-release.gpg add -
     echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
     sudo apt update
-    sudo apt install brave-browser
+    sudo apt install brave-browser -y -q
 }
 
 install_mpv() {
@@ -327,7 +354,7 @@ install_mpv() {
         sudo add-apt-repository ppa:mc3man/mpv-tests
     fi
     echo "Installing mpv"
-    sudo apt install mpv
+    sudo apt install mpv -y -q
 }
 
 refresh_bashrc() {
@@ -352,9 +379,12 @@ setup_environment() {
     copy_bash_configs
     set_username_to_bash_configs
     install_git
+    configure_git
     install_utils
     install_tmux
-    install_npm
+    install_nvm
+    refresh_bashrc
+    install_node
     install_java
     install_docker
     install_maven
