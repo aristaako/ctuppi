@@ -37,10 +37,10 @@ Script for setting up my personal dev environment.
 ## Todo
 
 * Install everything silently
-* Maybe add git setup
 * Improve emacs cheatsheet
 * Install mpv for debian
 * Ensure Clojure has compatible Java version (8 or 11)
+* List failed installations after ctuppi
 
 ## Thanks
 
