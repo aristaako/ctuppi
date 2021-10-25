@@ -198,6 +198,7 @@ install_tmux() {
     echo "Copying tmux configs to user root"
     cp files/tmux.conf ~/.tmux.conf
     cp files/splitter ~/.tmux/splitter
+    cp files/tmux-status.sh ~/.tmux/tmux-status.sh
 
     echo "Downloading tpm"
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
