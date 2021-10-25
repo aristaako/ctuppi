@@ -2,6 +2,7 @@
 alias aliakset='less /home/_username_/.bash_aliases'
 
 alias reload='. ~/.bashrc'
+alias forget='unalias -a'
 
 alias gs='git status'
 alias GS='git status'
