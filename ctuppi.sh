@@ -114,6 +114,9 @@ install_git() {
 
     echo "Installing git-cola"
     sudo apt install git-cola  -y -q
+
+    echo "Installing kdiff3"
+    sudo apt install kdiff3 -y -q
 }
 
 configure_git() {
@@ -135,6 +138,8 @@ configure_git() {
         done
         git config --global user.email "$email"
     fi
+    echo "Configuring git: merge tool kdiff3"
+    git config --global merge.tool kdiff3
 }
 
 

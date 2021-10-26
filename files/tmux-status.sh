@@ -44,6 +44,9 @@ get_branch_icon() {
     *"nothing to commit"*)
       echo "#[fg=$BRANCH_COLOR_NOTHING]$BRANCH_ICON" #colour240
       ;;
+    *"Changes not staged"*)
+      echo "#[fg=$BRANCH_COLOR_CHANGES]$BRANCH_ICON" #colour196
+      ;;
     *"nothing added to commit but untracked"*)
       echo "#[fg=$BRANCH_COLOR_UNTRACKED]$BRANCH_ICON" #colour166
       ;;
@@ -52,9 +55,6 @@ get_branch_icon() {
       ;;
     *"Changes to be committed"*)
       echo "#[fg=$BRANCH_COLOR_COMMITED]$BRANCH_ICON" #colour28
-      ;;
-    *"Changes not staged"*)
-      echo "#[fg=$BRANCH_COLOR_CHANGES]$BRANCH_ICON" #colour196
       ;;
   esac
 }
