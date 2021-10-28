@@ -92,13 +92,13 @@ set_status_bar() {
 }
 
 folder_status=""
-if $SHOW_FOLDER == "true"; then
+if [ "$SHOW_FOLDER" = "true" ]; then
   folder_status=$(get_folder_status)
 fi
 
 IS_GIT=$(get_git)
 status=""
-if $IS_GIT == true; then
+if [ $IS_GIT = true ]; then
   status=$(set_status_bar)
   echo $folder_status $status
 else
