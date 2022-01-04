@@ -251,28 +251,29 @@ install_docker() {
         echo "Installing docker"
         sudo apt install docker-ce docker-ce-cli containerd.io -y -q
     else
+        cd "~/Downloads"
         echo "Downloading docker "
-        sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/docker-ce_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb" -o "~/Downloads/docker-ce_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
+        sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/docker-ce_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb" -o "docker-ce_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
 
         echo "Downloading docker cli"
-        sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/docker-ce-cli_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb" -o "~/Downloads/docker-ce-cli_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
+        sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/docker-ce-cli_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb" -o "docker-ce-cli_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
 
         echo "Downloading containerd.io"
-        sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/containerd.io_1.3.7-1_amd64.deb" -o "~/Downloads/containerd.io_1.3.7-1_amd64.deb"
+        sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/containerd.io_1.4.9-1_amd64.deb" -o "containerd.io_1.4.9-1_amd64.deb"
 
         echo "Installing containerd.io"
-        sudo dpkg -i "~/Downloads/containerd.io_1.3.7-1_amd64.deb"
+        sudo dpkg -i "~/Downloads/containerd.io_1.4.9-1_amd64.deb"
 
         echo "Installing docker-ce-cli"
-        sudo dpkg -i "~/Downloads/docker-ce-cli_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
+        sudo dpkg -i "~/Downloads/docker-ce-cli_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
 
         echo "Installing docker-ce"
-        sudo dpkg -i "~/Downloads/docker-ce_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
+        sudo dpkg -i "~/Downloads/docker-ce_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
 
         echo "Removing downloaded docker debs"
-        rm "~/Downloads/containerd.io_1.3.7-1_amd64.deb"
-        rm "~/Downloads/docker-ce-cli_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
-        rm "~/Downloads/docker-ce_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
+        rm "~/Downloads/containerd.io_1.4.9-1_amd64.deb"
+        rm "~/Downloads/docker-ce-cli_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
+        rm "~/Downloads/docker-ce_20.10.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
     fi  
 
     sudo usermod -aG docker "$USER"  
