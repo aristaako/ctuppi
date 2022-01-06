@@ -1,0 +1,68 @@
+# https://misc.flogisoft.com/bash/tip_colors_and_formatting
+RESET_COLORS="\[\e[0m\]"
+
+TEXT_COLOR="\[\e[0;49;90m\]"
+PROMPT_COLOR="\[\e[1;49;32m\]"
+
+function get_branch_icon {
+    local git_status
+    git_status="$(git status 2> /dev/null)"
+
+    case "${git_status}" in
+    *"nothing to commit"*)
+      echo -e ' '
+      ;;
+    *"Changes not staged"*)
+      echo -e '\e[38;5;196m '
+      ;;
+    *"nothing added to commit but untracked"*)
+      echo -e '\e[38;5;166m '
+      ;;
+    *"conflicts"*)
+      echo -e '\e[38;5;196m ✖'
+      ;;
+    *"Changes to be committed"*)
+      echo -e '\e[38;5;28m '
+      ;;
+  esac
+}
+
+if [ "$color_prompt" = yes ]; then
+    PS1=""
+    # PS1+="\n" # new line
+    PS1+="${TEXT_COLOR}\w " # current directory path
+    PS1+="" # section splitter
+    PS1+=" "
+    PS1+=" \$(find . -mindepth 1 -maxdepth 1 -type d | wc -l) " # folder count
+    PS1+=" \$(find . -mindepth 1 -maxdepth 1 -type f | wc -l) " # file count
+    PS1+=" \$(find . -mindepth 1 -maxdepth 1 -type l | wc -l) " # symlink count
+    PS1+="" # section splitter
+    PS1+='\[$(get_branch_icon)\]$(__git_ps1 "\[\e[00m\] %s \[\e[0;49;90m\]")' # git branch with indicator
+    # PS1+='$(__git_ps1 "\[\e[00m\] %s \[\e[0;49;90m\]")' # git branch
+    PS1+="${PROMPT_COLOR} >: ${RESET_COLORS}" # prompt
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Alias definitions.
+if [ -f ~/.zsh_aliases ]; then
+    . ~/.zsh_aliases
+fi

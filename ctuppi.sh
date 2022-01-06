@@ -3,16 +3,17 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 2.2
+# Version     : 2.3
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best. See below
 #               for further instructions
 #===========================================================================
-VERSION=2.2
-CTUPPIID=ctuppi022000
+VERSION=2.3
+CTUPPIID=ctuppi023000
 LOCK=/tmp/$CTUPPIID.lock
 
 DEFAULT_DISTRO=ubuntu
+USER_OS=
 USER_DISTRO=
 VIRTUALIZED=false
 
@@ -36,41 +37,122 @@ showVersion() {
     echo "Ctuppi $VERSION"
 }
 
+#TODO: Refactor the following
 inquire_virtualbox() {
     while true; do
         read -p "Is this a virtualized environment? (y/n) " yn
         case $yn in
             [Yy]* ) echo "Roger that."; VIRTUALIZED=true; break;;
             [Nn]* ) echo "Okay."; break;;
-            * ) echo "Please answer yes or no.";;
+            * ) echo "Please answer yes or no (y/n).";;
         esac
     done
 }
 
 is_distro_debian() {
     while true; do
-        read -p "Are you using debian based distro? (y/n) " yn
+        read -p "Are you using Debian based distro? (y/n) " yn
         case $yn in
             [Yy]* ) echo "Great."; USER_DISTRO=debian; break;;
             [Nn]* ) echo "Sadness. Ctuppi does not support your distro."; exit;;
-            * ) echo "Please answer yes or no.";;
+            * ) echo "Please answer yes or no (y/n).";;
         esac
     done
 }
+
+is_distro_ubuntu() {
+    while true; do
+        read -p "Are you using Ubuntu based distro? (y/n) " yn
+        case $yn in
+            [Yy]* ) echo "Okay."; USER_DISTRO=ubuntu; break;;
+            [Nn]* ) echo "Sadness. Ctuppi does not support your distro."; exit;;
+            * ) echo "Please answer yes or no (y/n).";;
+        esac
+    done
+}
+
+is_bunsenlabs() {
+    while true; do
+        read -p "Are you using BunsenLabs? (y/n) " yn
+        case $yn in
+            [Yy]* ) echo "Great."; USER_DISTRO=debian; USER_OS=linux; break;;
+            [Nn]* ) inquire_distro; break;;
+            * ) echo "Please answer yes or no (y/n).";;
+        esac
+    done
+}
+
+inquire_distro_debian() {
+    while true; do
+        read -p "Are you using Debian based distro? (y/n) " yn
+        case $yn in
+            [Yy]* ) echo "Great."; USER_DISTRO=debian; USER_OS=linux; break;;
+            [Nn]* ) is_distro_ubuntu; break;;
+            * ) echo "Please answer yes or no (y/n).";;
+        esac
+    done
+}
+
 
 inquire_distro() {
     while true; do
-        read -p "Are you using ubuntu based distro? (y/n) " yn
+        read -p "Are you using Ubuntu based distro? (y/n) " yn
         case $yn in
-            [Yy]* ) echo "Okay."; USER_DISTRO=ubuntu; break;;
+            [Yy]* ) echo "Okay."; USER_DISTRO=ubuntu; USER_OS=linux; break;;
             [Nn]* ) is_distro_debian; break;;
-            * ) echo "Please answer yes or no.";;
+            * ) echo "Please answer yes or no (y/n).";;
         esac
     done
 }
 
+determine_os() {
+    os_info=$(cat /etc/os-releasfe 2> /dev/null)
+    os_info_length=${#os_info}
+    if [[ $os_info_length == 0 ]]; then
+        echo "Seems that this is not a Linux."
+        os_info_osx=$(sw_vers 2> /dev/null)
+        os_info_osx_length=${#os_info_osx}
+        os_name=$(grep ProductName <<< "$os_info_osx")
+        if [[ $os_info_length == 0 && $os_name == *"macOS"* ]]; then
+            echo "It is actually a mac."
+            USER_OS=osx    
+        fi
+    else
+        os_name=$(grep PRETTY_NAME <<< "$os_info")
+        echo "You are probably using Linux."
+        if [[ $os_name == *"Ubuntu"* ]]; then
+            echo "Hey, it's a Ubuntu!"
+            inquire_distro
+        elif [[ $os_name == *"Debian"* ]]; then
+            echo "Hey, it's a Debian!"
+            inquire_distro_debian
+        elif [[ $os_name == *"BunsenLabs"* ]]; then
+            echo "Hey, it's a BunsenLabs!"
+            is_bunsenlabs
+        fi
+    fi
+    if [[ ${#USER_OS} == 0 ]]; then
+        echo "Could not determine your operating system."
+        while true; do
+            read -p "Would you still like to run through the Linux setup as Ubuntu? (y/n) " yn
+            case $yn in
+                [Yy]* ) echo "Okay. Proceeding."; USER_DISTRO=ubuntu; USER_OS=linux; break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer yes or no (y/n).";;
+            esac
+        done
+    fi
+}
+
+# TODO END
+
 update_apt_packages() {
    sudo apt update -y -q
+}
+
+install_brew() {
+    echo "Installing brew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
 install_konsole() {
@@ -89,6 +171,12 @@ install_nerd_font() {
     fc-cache
 }
 
+install_nerd_font_osx() {
+    echo "Installing FiraCode Nerd Font"
+    brew tap homebrew/cask-fonts
+    brew install font-fira-code
+}
+
 copy_konsole_profile() {
     echo "Copying konsole profile"
     mkdir -p ~/.local/share/konsole
@@ -103,9 +191,22 @@ copy_bash_configs() {
     cp files/git-prompt.sh ~/opt/git-prompt/git-prompt.sh
 }
 
+copy_zsh_configs() {
+    echo "Copying zsg configs to user root"
+    cp files/bash_aliases ~/.zsh_aliases
+    cp files/zshrc ~/.zshrc
+    # mkdir -p ~/opt/git-prompt
+    # cp files/git-prompt.sh ~/opt/git-prompt/git-prompt.sh
+}
+
 set_username_to_bash_configs() {
     echo "Setting current user [$USER] for the bash config paths"
     sed -i "s/_username_/$USER/" ~/.bash_aliases
+}
+
+set_username_to_zsh_configs() {
+    echo "Setting current user [$USER] for the zsh config paths"
+    sed -i "s/_username_/$USER/" ~/.zsh_aliases
 }
 
 install_git() {
@@ -199,6 +300,23 @@ install_utils() {
 install_tmux() {
     echo "Installing tmux"
     sudo apt install tmux  -y -q
+
+    echo "Copying tmux configs to user root"
+    cp files/tmux.conf ~/.tmux.conf
+    cp files/splitter ~/.tmux/splitter
+    cp files/tmux-status.sh ~/.tmux/tmux-status.sh
+
+    echo "Downloading tpm"
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+    echo "Downloading tmux reset"
+    curl -Lo ~/.tmux/reset --create-dirs \
+        https://raw.githubusercontent.com/hallazzang/tmux-reset/master/tmux-reset
+}
+
+install_tmux_osx() {
+    echo "Installing tmux"
+    brew install tmux
 
     echo "Copying tmux configs to user root"
     cp files/tmux.conf ~/.tmux.conf
@@ -369,40 +487,70 @@ refresh_bashrc() {
     source ~/.bashrc
 }
 
+refresh_zshrc() {
+    echo "Refreshing .zshrc"
+    source ~/.zshrc
+}
+
 display_greetings() {
     echo "Thank you for using Ctuppi!"
     echo "Install tmux plugins by opening tmux and pressing PREFIX + I (capital i)."
     echo "Over and out."
 }
 
+setup_linux() {
+    echo "Setting up Linux"
+    # inquire_virtualbox
+    # update_apt_packages
+    # install_konsole
+    # install_nerd_font
+    # copy_konsole_profile
+    # copy_bash_configs
+    # set_username_to_bash_configs
+    # install_git
+    # configure_git
+    # install_utils
+    # install_tmux
+    # install_nvm
+    # refresh_bashrc
+    # install_node
+    # install_java
+    # install_docker
+    # install_maven
+    # install_gradle
+    # install_aws
+    # install_clojure
+    # install_emacs
+    # install_vscode
+    # install_brave
+    # install_mpv
+    # refresh_bashrc
+}
+
+setup_osx() {
+    echo "Setting up osx"
+    # install brew
+    # install_nerd_font_osx
+    # copy_zsh_configs
+    # set_username_to_zsh_configs
+    # install_git
+    # configure_git
+    # install_utils
+    # install_tmux_osx
+    # refresh_zshrc
+}
+
 setup_environment() {
     echo "Setting up dev environment"
-    inquire_virtualbox
-    inquire_distro
-    update_apt_packages
-    install_konsole
-    install_nerd_font
-    copy_konsole_profile
-    copy_bash_configs
-    set_username_to_bash_configs
-    install_git
-    configure_git
-    install_utils
-    install_tmux
-    install_nvm
-    refresh_bashrc
-    install_node
-    install_java
-    install_docker
-    install_maven
-    install_gradle
-    install_aws
-    install_clojure
-    install_emacs
-    install_vscode
-    install_brave
-    install_mpv
-    refresh_bashrc
+    determine_os
+    if [[ $USER_OS == "osx" ]]; then
+        setup_osx
+    elif [[ $USER_OS == "linux" ]]; then
+        setup_linux
+    else        
+        echo "Aborting setup."
+        exit
+    fi
     display_greetings
 }
 
