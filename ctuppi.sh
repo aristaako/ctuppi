@@ -3,18 +3,26 @@
 # Title       : ctuppi.sh
 # Description : Script for setting up my dev environment
 # Author      : aristaako
-# Version     : 2.2
+# Version     : 2.3
 # Notes       : Check readme.md for commands cheatsheet
 # Usage       : Just run the thing and hope for the best. See below
 #               for further instructions
 #===========================================================================
-VERSION=2.2
-CTUPPIID=ctuppi022000
+VERSION=2.3
+CTUPPIID=ctuppi023000
 LOCK=/tmp/$CTUPPIID.lock
 
 DEFAULT_DISTRO=ubuntu
 USER_DISTRO=
 VIRTUALIZED=false
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NO_COLOR='\033[0m'
+
+declare -a OPERATION_STARTED=()
+declare -a FAILED=()
+declare -a OPERATION_LIST=()
 
 showHelp() {
 cat <<-END
@@ -73,13 +81,36 @@ update_apt_packages() {
    sudo apt update -y -q
 }
 
+apt_install() {
+    display_name=$1
+    [[ ! -z "$2" ]] && package_name=$2 || package_name=$display_name
+    echo "Installing $display_name"
+    operation="Installation: $package_name"
+    OPERATION_STARTED+=( "$operation" )
+    sudo apt install $package_name -y -q || FAILED+=( "$operation" )
+}
+
+apt_remove() {
+    display_name=$1
+    [[ ! -z "$2" ]] && package_name=$2 || package_name=$display_name
+    echo "Removing $display_name"
+    operation="Remove: $package_name"
+    OPERATION_STARTED+=( "$operation" )
+    if [ "$(which $package_name 2> /dev/null)" != "" ]; then    
+        sudo apt remove $package_name -y -q || FAILED+=( "$operation" )
+    else
+        echo "$package_name not found"
+    fi
+    
+}
+
 install_konsole() {
-    echo "Installing konsole"
-    sudo apt install konsole -y -q
+    apt_install "konsole"
 }
 
 install_nerd_font() {
     echo "Installing FiraCode Nerd Font"
+    OPERATION_STARTED+=( "Installation: FiraCode Nerd Font" )
     wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/FiraCode.zip
     unzip FiraCode.zip -d FiraCode
     mkdir ~/.local/share/fonts/
@@ -109,14 +140,9 @@ set_username_to_bash_configs() {
 }
 
 install_git() {
-    echo "Installing git"
-    sudo apt install git  -y -q
-
-    echo "Installing git-cola"
-    sudo apt install git-cola  -y -q
-
-    echo "Installing kdiff3"
-    sudo apt install kdiff3 -y -q
+    apt_install "git"
+    apt_install "git-cola"
+    apt_install "kdiff3"
 }
 
 configure_git() {
@@ -144,61 +170,55 @@ configure_git() {
 
 
 install_utils() {
-    echo "Installing curl"
-    sudo apt install curl -y -q
+    apt_install "curl"
 
     echo "Installing ripgrep"
+    OPERATION_STARTED+=( "Installation: ripgrep" )
     curl -LO https://github.com/BurntSushi/ripgrep/releases/download/12.1.1/ripgrep_12.1.1_amd64.deb
     sudo dpkg -i "ripgrep_12.1.1_amd64.deb"
 
     echo "Removing ripgrep deb"
+    OPERATION_STARTED+=( "Remove: ripgrep_12.1.1_amd64.deb" )
     rm "ripgrep_12.1.1_amd64.deb"
 
-    echo "Installing pip"
-    sudo apt install python-pip  -y -q
+    apt_install "python-pip"
 
-    echo "Installing python3 and pip3"
-    sudo apt install -y python3 python3-pip -y -q
+    apt_install "python3"
+    apt_install "python3-pip"
 
-    echo "Installing sqlite3"
-    sudo apt install libsqlite3-dev -y -q
+    apt_install "sqlite3" "libsqlite3-dev"
 
-    echo "Installing ruby"
-    sudo apt install ruby-full -y -q
+    apt_install "ruby"
 
     echo "Installing mailcatcher"
+    OPERATION_STARTED+=( "Installation: mailcatcher" )
     sudo gem install mailcatcher 
 
-    echo "Installing gedit"
-    sudo apt install gedit -y -q
+    apt_install "gedit"
 
-    echo "Installing atom"
     wget -qO - https://packagecloud.io/AtomEditor/atom/gpgkey | sudo apt-key add
     sudo sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/atom.list'
-    sudo apt install atom -y -q
+    update_apt_packages
+    apt_install "atom"
 
-    echo "Installing tree"
-    sudo apt install tree -y -q
+    apt_install "tree"
 
     echo "Installing SDKMAN!"
+    OPERATION_STARTED+=( "Installation: SDKMAN!" )
     curl -s "https://get.sdkman.io" | bash
     source "/home/$USER/.sdkman/bin/sdkman-init.sh"
 
-    echo "Installing Silver Searcher"
-    sudo apt install silversearcher-ag
+    apt_install "Silver Searcher" "silversearcher-ag"
 
-    echo "Installing ssh"
-    sudo apt install openssh-server -y -q
+    apt_install "ssh" "openssh-server"
 
     if [ "$VIRTUALIZED" == "false" ]; then
-        echo "Installing solaar for Logitech bluetooth devices"
-        sudo apt install solaar -y -q
+        apt_install "solaar for Logitech bluetooth devices" "solaar"
     fi
 }
 
 install_tmux() {
-    echo "Installing tmux"
-    sudo apt install tmux  -y -q
+    apt_install "tmux"
 
     echo "Copying tmux configs to user root"
     cp files/tmux.conf ~/.tmux.conf
@@ -206,35 +226,46 @@ install_tmux() {
     cp files/tmux-status.sh ~/.tmux/tmux-status.sh
 
     echo "Downloading tpm"
+    OPERATION_STARTED+=( "Installation: tpm" )
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
     echo "Downloading tmux reset"
+    OPERATION_STARTED+=( "Installation: tmux reset" )
     curl -Lo ~/.tmux/reset --create-dirs \
         https://raw.githubusercontent.com/hallazzang/tmux-reset/master/tmux-reset
 }
 
 install_nvm() {
     echo "Installing nvm"
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+    OPERATION_STARTED+=( "Installation: nvm" )
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+    refresh_bashrc
 }
 
 install_node() {
     echo "Installing node"
+    OPERATION_STARTED+=( "Installation: node" )
     nvm install node
 }
 
 install_java() {
-    echo "Installing default java jdk"
-    sudo apt install default-jdk -y -q
+    apt_install "default java jdk" "default-jdk"
 }
 
 install_docker() {
     echo "Preparing to install docker"
     echo "First cleaning older versions"
-    sudo apt remove docker docker-engine docker.io containerd runc -y -q
+    apt_remove "docker"
+    apt_remove "docker-engine"
+    apt_remove "docker.io"
+    apt_remove "containerd"
+    apt_remove "runc"
 
     echo "Installing packages to allow apt to use repositories over HTTPS"
-    sudo apt install apt-transport-https ca-certificates gnupg-agent software-properties-common -y -q
+    apt_install "  apt-transport-https" "apt-transport-https"
+    apt_install "  ca-certificates" "ca-certificates"
+    apt_install "  gnupg-agent" "gnupg-agent"
+    apt_install "  software-properties-common" "software-properties-common"
 
     if [ "$DEFAULT_DISTRO" == "$USER_DISTRO" ]; then
         echo "Adding Docker's official GPG key"
@@ -244,12 +275,14 @@ install_docker() {
         sudo add-apt-repository \
         "deb [arch=amd64] https://download.docker.com/linux/$DEFAULT_DISTRO \
         $(lsb_release -cs) \
-        stable"
+        stable" -y
 
         update_apt_packages
 
         echo "Installing docker"
-        sudo apt install docker-ce docker-ce-cli containerd.io -y -q
+        apt_install "  docker-ce" "docker-ce"
+        apt_install "  docker-ce-cli" "docker-ce-cli"
+        apt_install "  containerd.io" "containerd.io"
     else
         echo "Downloading docker "
         sudo curl -L "https://download.docker.com/linux/$USER_DISTRO/dists/$(lsb_release -cs)/pool/stable/amd64/docker-ce_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb" -o "~/Downloads/docker-ce_19.03.9~3-0~$USER_DISTRO-$(lsb_release -cs)_amd64.deb"
@@ -278,27 +311,26 @@ install_docker() {
     sudo usermod -aG docker "$USER"  
 
     echo "Installing docker-compose with pip3"
+    OPERATION_STARTED+=( "Installation: docker-compose" )
     pip3 install --user docker-compose
 }
 
 install_maven() {
-    echo "Installing maven"
-    sudo apt install maven -y -q
+    apt_install "maven"
 }
 
 install_gradle() {
     echo "Installing gradle"
+    OPERATION_STARTED+=( "Installation: gradle" )
     sdk install gradle 6.6.1
 }
 
 install_aws() {
-    echo "Installing aws"
-    sudo apt install awscli -y -q
+    apt_install "AWS" "awscli"
 }
 
 install_clojure() {
-    echo "Installing readline wrapper"
-    sudo apt install rlwrap -y -q
+    apt_install "readline wrapper" "rlwrap"
 
     curl -O https://download.clojure.org/install/linux-install-1.10.1.727.sh
     chmod +x linux-install-1.10.1.727.sh
@@ -308,6 +340,7 @@ install_clojure() {
     rm linux-install-1.10.1.727.sh
 
     echo "Install leiningen"
+    OPERATION_STARTED+=( "Installation: Leiningen" )
     curl -o ~/bin/lein --create-dirs https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
     chmod a+x ~/bin/lein
     PATH=$PATH:~/bin
@@ -315,13 +348,14 @@ install_clojure() {
 }
 
 install_emacs() {
-    echo "Installing emacs"
-    sudo apt install emacs -y -q
+    apt_install "Emacs" "emacs"
 
     echo "Installing emacs live"
-    bash <(curl -fksSL https://raw.github.com/overtone/emacs-live/master/installer/install-emacs-live.sh)
+    OPERATION_STARTED+=( "Installation: Emacs live" )
+    yes '' |bash <(curl -fksSL https://raw.github.com/overtone/emacs-live/master/installer/install-emacs-live.sh)
 
     echo "Installing flowapack"
+    OPERATION_STARTED+=( "Installation: flowa-pack for Emacs" )
     git clone https://github.com/flowa/flowa-pack.git ~/.flowa-pack
     mv ~/.flowa-pack/.emacs-live.el ~/.emacs-live.el 
     cd ~/.flowa-pack
@@ -336,31 +370,26 @@ install_emacs() {
 }
 
 install_vscode() {
-    echo "Installing Visual Studio Code"
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
     sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
     sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-    sudo apt install apt-transport-https -y -q
-    sudo apt update
-    sudo apt install code -y -q
+    update_apt_packages
+    apt_install "Visual Studio Code" "code"
 }
 
 install_brave() {
-    echo "Installing Brave browser"
-    sudo apt install apt-transport-https curl
     curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | sudo apt-key --keyring /etc/apt/trusted.gpg.d/brave-browser-release.gpg add -
     echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-    sudo apt update
-    sudo apt install brave-browser -y -q
+    update_apt_packages
+    apt_install "Brave browser" "brave-browser"
 }
 
 install_mpv() {
     if [ "$DEFAULT_DISTRO" == "$USER_DISTRO" ]; then
         echo "Adding repository for mpv"
-        sudo add-apt-repository ppa:mc3man/mpv-tests
+        sudo add-apt-repository ppa:mc3man/mpv-tests -y
     fi
-    echo "Installing mpv"
-    sudo apt install mpv -y -q
+    apt_install "mpv"
 }
 
 refresh_bashrc() {
@@ -372,6 +401,44 @@ display_greetings() {
     echo "Thank you for using Ctuppi!"
     echo "Install tmux plugins by opening tmux and pressing PREFIX + I (capital i)."
     echo "Over and out."
+}
+
+create_operation_list() {
+    longest_operation_name_length=0
+    for item in "${OPERATION_STARTED[@]}"
+    do
+        item_length=${#item}
+        if [ "$item_length" -gt "$longest_operation_name_length" ]; then
+            longest_operation_name_length=$item_length
+        fi
+    done
+
+    for value in "${OPERATION_STARTED[@]}"
+    do
+        value_length=${#value}
+        value_shorter_than_longest=$((longest_operation_name_length-value_length))
+        spaces=
+        for i in $(seq 1 $value_shorter_than_longest); do spaces+=" "; done
+
+        operation_row=
+        if [[ ! " ${FAILED[*]} " =~ " ${value} " ]]; then
+            INSTALLED+=( "$value" )
+            operation_row="$spaces$value $GREEN OK $NO_COLOR"
+            OPERATION_LIST+=( "$operation_row" )
+        else
+            operation_row="$spaces$value $RED NOK $NO_COLOR"
+            OPERATION_LIST+=( "$operation_row" )
+        fi
+    done
+}
+
+print_operation_list() {
+    echo ""
+    for item in "${OPERATION_LIST[@]}"
+    do
+        echo -e "$item"
+    done
+    echo ""
 }
 
 setup_environment() {
@@ -402,6 +469,8 @@ setup_environment() {
     install_brave
     install_mpv
     refresh_bashrc
+    create_operation_list
+    print_operation_list
     display_greetings
 }
 
